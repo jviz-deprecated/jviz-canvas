@@ -1,0 +1,10 @@
+{
+	"name": "jviz-canvas",
+	"description": "Canvas web component",
+	"ignore": [ "**/.*", "node_modules", "bower_components", "build" ],
+	"dependencies":
+  {
+    "jviz": "https://github.com/jviz/jviz.git#dev"
+  },
+	"license": "MIT"
+}
