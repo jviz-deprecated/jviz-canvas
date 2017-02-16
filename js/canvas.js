@@ -12,7 +12,7 @@
 //
 
 //Initialize the component
-jviz.components.canvas = new jviz.component({ attributes: [ 'layers' ] });
+jviz.components.canvas = new jviz.component({ attributes: [ 'layers', 'width', 'height' ] });
 
 //Init function
 jviz.components.canvas.prototype._init = function()
@@ -89,6 +89,15 @@ jviz.components.canvas.prototype._attribute = function(name, old_value, new_valu
 
   //Check the layers number
   if(name === 'layers'){ return this.build_layers(new_value); }
+
+  //Check the width value
+  else if(name === 'width'){ return this.size({ width: new_value }); }
+
+  //Check the height value
+  else if(name === 'height'){ return this.size({ height: new_value }); }
+
+  //Exit
+  return;
 };
 
 //Build the layers
