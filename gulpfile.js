@@ -41,3 +41,6 @@ gulp.task('build:js', function()
 
 //Build wrapper
 gulp.task('build', [ 'clean', 'build:scss', 'build:js' ]);
+
+//Default task
+gulp.task('default', [ 'build' ]);
