@@ -1,0 +1,22 @@
+//Import dependencies
+@import "jviz/scss/_mixins.scss";
+
+//Canvas component
+.jviz-components-canvas
+{
+  //Style
+  display: block;
+
+  //Position
+  position: relative;
+
+  //Canvas element
+  &-canvas
+  {
+    //Display
+    display: block;
+
+    //Position
+    position: absolute; top: 0px; left: 0px;
+  }
+}
