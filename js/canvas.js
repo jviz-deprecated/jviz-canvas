@@ -60,13 +60,13 @@ jviz.components.canvas.prototype._created = function()
   //this.innerHTML = jviz.dom.render('div', { id: this._id, class: this._class });
 
   //Display the provided number of layers
-  if(this.getAttribute('layers') !== null){ this.build_layers(this.getAttribute('layers')); }
+  if(this.getAttribute('layers') !== null){ this.set_layers(this.getAttribute('layers')); }
 
   //Set the layers size
-  if(this.getAttribute('width') !== null){ this.set_size({ width: this.getAttribute('width') }); }
+  if(this.getAttribute('width') !== null){ this.set_width(this.getAttribute('width')); }
 
   //Get the height
-  if(this.getAttribute('height') !== null){ this.set_size({ height: this.getAttribute('height') }); }
+  if(this.getAttribute('height') !== null){ this.set_height(this.getAttribute('height')); }
 };
 
 //Destroyed event
@@ -79,23 +79,61 @@ jviz.components.canvas.prototype._destroyed = function()
 jviz.components.canvas.prototype._attribute = function(name, old_value, new_value)
 {
   //Check the layers number
-  if(name === 'layers'){ return this.build_layers(new_value); }
+  if(name === 'layers'){ return this.set_layers(new_value); }
 
   //Check the width value
-  else if(name === 'width'){ return this.set_size({ width: new_value }); }
+  else if(name === 'width'){ return this.set_width(new_value); }
 
   //Check the height value
-  else if(name === 'height'){ return this.set_size({ height: new_value }); }
+  else if(name === 'height'){ return this.set_sheight(new_value); }
 };
 
-//Build the layers
-jviz.components.canvas.prototype.build_layers = function(num)
+//Add the margins
+jviz.components.canvas.prototype.set_margin = function(opt)
 {
-  //Clear the container
-  jviz.dom.html(this._id, '');
+  //Check the options
+  if(typeof opt !== 'object'){ return this._draw.margin; }
+
+  //Check the margin top value
+  if(typeof opt.top !== 'undefined'){ this._draw.margin.top = parseInt(opt.top); }
+
+  //Check margin bottom value
+  if(typeof opt.bottom !== 'undefined'){ this._draw.margin.bottom = parseInt(opt.bottom); }
+
+  //Check the margin left value
+  if(typeof opt.left !== 'undefined'){ this._draw.margin.left = parseInt(opt.left); }
+
+  //Check the margin right value
+  if(typeof opt.right !== 'undefined'){ this._draw.margin.right = parseInt(opt.right); }
+
+  //Resize the draw
+  this.draw_resize();
+
+  //Continue
+  return this;
+};
+
+//Get the draw object
+jviz.components.canvas.prototype.get_draw = function(){ return this._draw; };
+
+//Get the layers objects
+jviz.components.canvas.prototype.get_layers = function()
+{
+  //Return the layer elements
+  return this._layers.el;
+};
+
+//Set the number of layers
+jviz.components.canvas.prototype.set_layers = function(num)
+{
+  //Check the number of layers
+  if(parseInt(num) === this._layers.num){ return this; }
 
   //Save the number of layers
   this._layers.num = parseInt(num);
+
+  //Clear the container
+  jviz.dom.html(this._id, '');
 
   //Reset the layers elements
   this._layers.el = [];
@@ -129,72 +167,11 @@ jviz.components.canvas.prototype.build_layers = function(num)
     this._layers.el.push(el);
   }
 
+  //Set the number of layers
+  //this.setAttribute('layers', num);
+
   //Exit
   return this;
-};
-
-//Add the margins
-jviz.components.canvas.prototype.set_margin = function(opt)
-{
-  //Check the options
-  if(typeof opt !== 'object'){ return this._draw.margin; }
-
-  //Check the margin top value
-  if(typeof opt.top !== 'undefined'){ this._draw.margin.top = parseInt(opt.top); }
-
-  //Check margin bottom value
-  if(typeof opt.bottom !== 'undefined'){ this._draw.margin.bottom = parseInt(opt.bottom); }
-
-  //Check the margin left value
-  if(typeof opt.left !== 'undefined'){ this._draw.margin.left = parseInt(opt.left); }
-
-  //Check the margin right value
-  if(typeof opt.right !== 'undefined'){ this._draw.margin.right = parseInt(opt.right); }
-
-  //Resize the draw
-  this.draw_resize();
-
-  //Continue
-  return this;
-};
-
-//Set the object size
-jviz.components.canvas.prototype.set_size = function(opt)
-{
-  //Check the width value
-  if(typeof opt.width !== 'undefined'){ jviz.dom.width(this._id, opt.width); }
-
-  //Check the height value
-  if(typeof opt.height !== 'undefined'){ jviz.dom.height(this._id, opt.height); }
-
-  //Resize
-  return this.resize();
-};
-
-//Get the object size
-jviz.components.canvas.prototype.get_size = function()
-{
-  //Return the object size
-  return { width: this._width, height: this._height };
-};
-
-//Get the draw object
-jviz.components.canvas.prototype.get_draw = function(){ return this._draw; };
-
-//Get the layer
-jviz.components.canvas.prototype.get_layer = function(index)
-{
-  //Check the index
-  if(typeof index === 'undefined'){ return jviz.console.error('No layer index provided', null); }
-
-  //Parse the index
-  index = parseInt(index);
-
-  //Check the index value
-  if(index < 0 || index > this._layers.num){ return jviz.console.error('Invalid layer index', null); }
-
-  //Return the layer element
-  return this._layers.el[index];
 };
 
 //Get the number of layers
@@ -239,6 +216,26 @@ jviz.components.canvas.prototype.set_height = function(value)
 {
   //Set the canvas size
   return this.set_size({ height: value });
+};
+
+//Set the object size
+jviz.components.canvas.prototype.set_size = function(opt)
+{
+  //Check the width value
+  if(typeof opt.width !== 'undefined'){ jviz.dom.width(this._id, opt.width); }
+
+  //Check the height value
+  if(typeof opt.height !== 'undefined'){ jviz.dom.height(this._id, opt.height); }
+
+  //Resize
+  return this.resize();
+};
+
+//Get the object size
+jviz.components.canvas.prototype.get_size = function()
+{
+  //Return the object size
+  return { width: this._width, height: this._height };
 };
 
 //Resize the tool
