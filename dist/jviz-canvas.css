@@ -1,0 +1,8 @@
+.jviz-components-canvas {
+  display: block;
+  position: relative; }
+  .jviz-components-canvas-canvas {
+    display: block;
+    position: absolute;
+    top: 0px;
+    left: 0px; }
