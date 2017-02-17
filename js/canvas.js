@@ -42,37 +42,31 @@ jviz.components.canvas.prototype._init = function()
 
   //Layers elements
   this._layers = {};
-  this._layers.num = 1; //Number of layers
+  this._layers.num = 0; //Number of layers
   this._layers.el = []; //Layers elements
   this._layers.id = []; //Layers id names
-
-  //Ready to render
-  this._render = false;
 };
 
 //Create event
 jviz.components.canvas.prototype._created = function()
 {
+  //Update the component id
+  this._id = this._parse_id(this._id);
+
+  //Add the class
+  jviz.dom.class.add(this, this._class);
+
   //Build the canvas container
-  this.innerHTML = jviz.dom.render('div', { id: this._id, class: this._class });
+  //this.innerHTML = jviz.dom.render('div', { id: this._id, class: this._class });
 
-  //Set ready to render
-  this._render = true;
+  //Display the provided number of layers
+  if(this.getAttribute('layers') !== null){ this.build_layers(this.getAttribute('layers')); }
 
-  //Get the number of layers
-  var value_layers = (this.getAttribute('layers') !== null) ? this.getAttribute('layers') : this._layers.num;
-
-  //Build the layers
-  this.build_layers(value_layers);
-
-  //Get the width
-  var value_width = (this.getAttribute('width') !== null) ? this.getAttribute('width') : this._width;
+  //Set the layers size
+  if(this.getAttribute('width') !== null){ this.set_size({ width: this.getAttribute('width') }); }
 
   //Get the height
-  var value_height = (this.getAttribute('height') !== null) ? this.getAttribute('height') : this._height;
-
-  //Set the size
-  this.size({ width: value_width, height: value_height });
+  if(this.getAttribute('height') !== null){ this.set_size({ height: this.getAttribute('height') }); }
 };
 
 //Destroyed event
@@ -84,20 +78,14 @@ jviz.components.canvas.prototype._destroyed = function()
 //Attribute change
 jviz.components.canvas.prototype._attribute = function(name, old_value, new_value)
 {
-  //Check the render
-  if(this._render === false){ return; }
-
   //Check the layers number
   if(name === 'layers'){ return this.build_layers(new_value); }
 
   //Check the width value
-  else if(name === 'width'){ return this.size({ width: new_value }); }
+  else if(name === 'width'){ return this.set_size({ width: new_value }); }
 
   //Check the height value
-  else if(name === 'height'){ return this.size({ height: new_value }); }
-
-  //Exit
-  return;
+  else if(name === 'height'){ return this.set_size({ height: new_value }); }
 };
 
 //Build the layers
@@ -146,7 +134,7 @@ jviz.components.canvas.prototype.build_layers = function(num)
 };
 
 //Add the margins
-jviz.components.canvas.prototype.margin = function(opt)
+jviz.components.canvas.prototype.set_margin = function(opt)
 {
   //Check the options
   if(typeof opt !== 'object'){ return this._draw.margin; }
@@ -171,11 +159,8 @@ jviz.components.canvas.prototype.margin = function(opt)
 };
 
 //Set the object size
-jviz.components.canvas.prototype.size = function(opt)
+jviz.components.canvas.prototype.set_size = function(opt)
 {
-  //Check the options
-  if(typeof opt === 'undefined'){ return { width: this._width, height: this._height }; }
-
   //Check the width value
   if(typeof opt.width !== 'undefined'){ jviz.dom.width(this._id, opt.width); }
 
@@ -183,17 +168,21 @@ jviz.components.canvas.prototype.size = function(opt)
   if(typeof opt.height !== 'undefined'){ jviz.dom.height(this._id, opt.height); }
 
   //Resize
-  this.resize();
+  return this.resize();
+};
 
-  //Exit
-  return this;
+//Get the object size
+jviz.components.canvas.prototype.get_size = function()
+{
+  //Return the object size
+  return { width: this._width, height: this._height };
 };
 
 //Get the draw object
-jviz.components.canvas.prototype.draw = function(){ return this._draw; };
+jviz.components.canvas.prototype.get_draw = function(){ return this._draw; };
 
 //Get the layer
-jviz.components.canvas.prototype.layer = function(index)
+jviz.components.canvas.prototype.get_layer = function(index)
 {
   //Check the index
   if(typeof index === 'undefined'){ return jviz.console.error('No layer index provided', null); }
@@ -232,25 +221,25 @@ jviz.components.canvas.prototype.layer_size = function(index, width, height)
   this._layers.el[index]._id.height = height;
 };
 
-//Add the height and width attributes
-[ 'width', 'height' ].forEach(function(el)
+//Get the layer width
+jviz.components.canvas.prototype.get_width = function(){ return this._width; };
+
+//Get the layer height
+jviz.components.canvas.prototype.get_height = function(){ return this._height; };
+
+//Set the layer width
+jviz.components.canvas.prototype.set_width = function(value)
 {
-  //Add the canvas track feature
-  jviz.components.canvas.prototype[el] = function(value)
-  {
-    //Check the value
-    if(typeof value === 'undefined'){ return this['_' + el]; }
+  //Set the canvas size
+  return this.set_size({ width: value });
+};
 
-    //Initialize the object
-    var obj = jviz.object.add({}, el, value);
-
-    //Set the size
-    this.size(obj);
-
-    //Return this
-    return this;
-  };
-});
+//Set the layer height
+jviz.components.canvas.prototype.set_height = function(value)
+{
+  //Set the canvas size
+  return this.set_size({ height: value });
+};
 
 //Resize the tool
 jviz.components.canvas.prototype.resize = function()
@@ -269,10 +258,7 @@ jviz.components.canvas.prototype.resize = function()
   }
 
   //Resize the draw
-  this.draw_resize();
-
-  //Continue
-  return this;
+  return this.draw_resize();
 };
 
 //Clear all layers
