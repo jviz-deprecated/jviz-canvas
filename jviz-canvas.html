@@ -19,7 +19,7 @@ The Jviz Project is under the MIT License. See https://github.com/jviz/jviz/blob
       }
 
       /* Calvas layer */
-      :host .layer
+      :host ::content .layer
       {
         /* Display */
         display: block;
@@ -34,7 +34,218 @@ The Jviz Project is under the MIT License. See https://github.com/jviz/jviz/blob
 </dom-module>
 
 <!-- Canvas logic -->
-<link rel="import" href="./src/canvas.html">
+<script>
+
+//Initialize the component
+jviz.components.canvas = {};
+
+//Add the element tag
+jviz.components.canvas.is = 'jviz-canvas';
+
+//Initialize the properties
+jviz.components.canvas.properties = {};
+jviz.components.canvas.properties.canvasLayers = { type: Number, value: 1, reflectToAttribute: true, observer: 'update_layers' };
+jviz.components.canvas.properties.canvasWidth = { type: String, value: '0px', reflectToAttribute: true, observer: 'update_width' };
+jviz.components.canvas.properties.canvasHeight = { type: String, value: '0px', reflectToAttribute: true, observer: 'update_height' };
+
+//Created method
+jviz.components.canvas.created = function()
+{
+  //Actual width value
+  this._width = 0;
+
+  //Actual height value
+  this._height = 0;
+
+  //Draw object
+  this._draw = {};
+  this._draw.width = 0; //Draw width
+  this._draw.height = 0; //Draw height
+  this._draw.margin = { top: 0, bottom: 0, left: 0, right: 0 }; //Default margin
+
+  //Layers elements
+  this._layers = {};
+  this._layers.id = 'layer-'; //Layers id
+  this._layers.class = 'layer'; //Layers class
+  this._layers.el = []; //Layers elements
+};
+
+//Ready function
+jviz.components.canvas.ready = function()
+{
+  //Resize the canvas
+  //Doesn't fix the bug of the element size
+  //this.resize();
+};
+
+//Updated layers
+jviz.components.canvas.update_layers = function(new_value, old_value)
+{
+  //Clear the container
+  jviz.dom.html(this, '');
+
+  //Reset the layers elements
+  this._layers.el = [];
+
+  //Resize the canvas
+  this.resize();
+
+  //Build the layers
+  for(var i = 0; i < this.canvasLayers; i++)
+  {
+    //Get the layer html
+    var layer_html = jviz.dom.render('canvas', { id: this._layers.id + i, class: this._layers.class });
+
+    //Add the layer
+    jviz.dom.append(this, layer_html);
+  }
+
+  //Initialize the canvas elements
+  for(var i = 0; i < this.canvasLayers; i++)
+  {
+    //Get the canvas element
+    var el = new jviz.canvas({ id: this._layers.id + i, width: this._width, height: this._height });
+
+    //Initialize the new canvas object
+    this._layers.el.push(el);
+  }
+};
+
+//Set the number of layers
+jviz.components.canvas.set_layers = function(value)
+{
+  //Set the number of payers
+  this.canvasLayers = parseInt(value);
+};
+
+//Get the layers elements
+jviz.components.canvas.get_layers = function(){ return this._layers.el; };
+
+//Changed width value
+jviz.components.canvas.update_width = function(new_value, old_value)
+{
+  // Bug: the first time when the component is loaded, the width value is saved correctly, but when
+  // we want to get the real width (or height) value, it returns a null value
+  //Set the width value
+  jviz.dom.width(this.id, new_value);
+
+  //Resize the layers
+  this.resize();
+
+  /*//This works, but I don't like the solution...
+  //http://stackoverflow.com/a/30609350/2328955
+  this.async(function()
+  {
+    //Set the width value
+    jviz.dom.width(this.id, new_value);
+
+    //Resize the layers
+    this.resize();
+  },1);
+  // */
+};
+
+//Changed height value
+jviz.components.canvas.update_height = function(new_value, old_value)
+{
+  //Set the height value
+  jviz.dom.height(this.id, new_value);
+
+  //Resize the layers
+  this.resize();
+};
+
+//Set the canvas width
+jviz.components.canvas.set_width = function(value){ this.canvasWidth = value; };
+
+//Set the canvas height
+jviz.components.canvas.set_height = function(value){ this.canvasHeight = value; };
+
+//Get the margins
+jviz.components.canvas.get_margin = function(){ return this._draw.margin; };
+
+//Set the margin values
+jviz.components.canvas.set_margin = function(opt)
+{
+  //Check the options
+  if(typeof opt !== 'object'){ return; }
+
+  //Check the margin top value
+  if(typeof opt.top !== 'undefined'){ this._draw.margin.top = parseInt(opt.top); }
+
+  //Check margin bottom value
+  if(typeof opt.bottom !== 'undefined'){ this._draw.margin.bottom = parseInt(opt.bottom); }
+
+  //Check the margin left value
+  if(typeof opt.left !== 'undefined'){ this._draw.margin.left = parseInt(opt.left); }
+
+  //Check the margin right value
+  if(typeof opt.right !== 'undefined'){ this._draw.margin.right = parseInt(opt.right); }
+
+  //Resize the draw
+  return this.draw_resize();
+};
+
+//Resize the canvas layers
+jviz.components.canvas.resize = function()
+{
+  //Get the width
+  this._width = jviz.dom.width(this.id);
+
+  //Get the height
+  this._height = jviz.dom.height(this.id);
+
+  //Save this
+  var self = this;
+
+  //Read all the layers
+  this._layers.el.forEach(function(el)
+  {
+    //Set the width value
+    el._id.width = self._width;
+
+    //Update the height
+    el._id.height = self._height;
+  });
+
+  //Resize the draw
+  return this.draw_resize();
+};
+
+//Get the draw zone
+jviz.components.canvas.get_draw = function(){ return this._draw; };
+
+//Clear all layers
+jviz.components.canvas.clear = function()
+{
+  //Read all the canvas layers and clear the content
+  this._layers.el.forEach(function(el){ el.clear(); });
+};
+
+//Draw test
+jviz.components.canvas.draw_test = function()
+{
+  //Get the first canvas layer
+  var canvas = this._layers.el[0];
+
+  //Draw the test zone rectangle
+  canvas.rect({ x: this._draw.margin.left, y: this._draw.margin.top, width: this._draw.width, height: this._draw.height });
+
+  //Add the fill color
+  canvas.fill({ color: jviz.colors.navy.hex, opacity: 0.2 });
+};
+
+//Resize the draw zone
+jviz.components.canvas.draw_resize = function()
+{
+  //Resize the draw width
+  this._draw.width = Math.max(0, this._width - this._draw.margin.left - this._draw.margin.right);
+
+  //Resize the draw height
+  this._draw.height = Math.max(0, this._height - this._draw.margin.top - this._draw.margin.bottom);
+};
+
+</script>
 
 <!-- Initialize the multicanvas element -->
-<script> Polymer(jviz.components.canvas); </script>
+<script>Polymer(jviz.components.canvas);</script>
