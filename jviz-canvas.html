@@ -161,6 +161,12 @@ jviz.components.canvas.set_width = function(value){ this.canvasWidth = value; };
 //Set the canvas height
 jviz.components.canvas.set_height = function(value){ this.canvasHeight = value; };
 
+//Get the canvas width
+jviz.components.canvas.get_width = function(){ return this._width; };
+
+//Get the canvas height
+jviz.components.canvas.get_height = function(){ return this._height; };
+
 //Get the margins
 jviz.components.canvas.get_margin = function(){ return this._draw.margin; };
 
