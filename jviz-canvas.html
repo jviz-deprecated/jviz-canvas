@@ -1,0 +1,40 @@
+<!--
+@license
+Copyright (c) 2016 The Jviz Project Authors. All rights reserved.
+The Jviz Project is under the MIT License. See https://github.com/jviz/jviz/blob/dev/LICENSE
+-->
+
+<!-- Dom module -->
+<dom-module id="jviz-canvas">
+  <template>
+    <style>
+      /* Main host style */
+      :host
+      {
+        /* Display */
+        display: block;
+
+        /* Position */
+        position: relative;
+      }
+
+      /* Calvas layer */
+      :host .layer
+      {
+        /* Display */
+        display: block;
+
+        /* Position */
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+    </style>
+  </template>
+</dom-module>
+
+<!-- Canvas logic -->
+<link rel="import" href="./src/canvas.html">
+
+<!-- Initialize the multicanvas element -->
+<script> Polymer(jviz.components.canvas); </script>
