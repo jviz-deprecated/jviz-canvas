@@ -4,7 +4,9 @@
 	"ignore": [ "**/.*", "node_modules", "bower_components", "build" ],
   "dependencies":
   {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "jviz": "https://github.com/jviz/jviz.git#dev",
+    "jviz-styles": "https://github.com/jviz/jviz-styles.git#dev"
   },
   "devDependencies":
   {
