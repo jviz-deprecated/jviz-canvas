@@ -13,7 +13,7 @@ The Jviz Project is under the MIT License. See https://github.com/jviz/jviz/blob
 <dom-module id="jviz-canvas">
   <template>
     <style>
-    
+
       /* Main host style */
       :host
       {
@@ -45,9 +45,9 @@ jviz.components.canvas.is = 'jviz-canvas';
 
 //Initialize the properties
 jviz.components.canvas.properties = {};
-jviz.components.canvas.properties.canvasLayers = { type: Number, value: 1, reflectToAttribute: true, observer: 'update_layers' };
-jviz.components.canvas.properties.canvasWidth = { type: String, value: '0px', reflectToAttribute: true, observer: 'update_width' };
-jviz.components.canvas.properties.canvasHeight = { type: String, value: '0px', reflectToAttribute: true, observer: 'update_height' };
+//jviz.components.canvas.properties.canvasLayers = { type: Number, reflectToAttribute: true, observer: 'update_layers' };
+jviz.components.canvas.properties.canvasWidth = { type: String, reflectToAttribute: true, observer: 'update_width' };
+jviz.components.canvas.properties.canvasHeight = { type: String, reflectToAttribute: true, observer: 'update_height' };
 
 //Created method
 jviz.components.canvas.created = function()
@@ -66,6 +66,7 @@ jviz.components.canvas.created = function()
 
   //Layers elements
   this._layers = {};
+  this._layers.num = 0; //Number of layers
   this._layers.id = 'layer-'; //Layers id
   this._layers.class = 'layer'; //Layers class
   this._layers.el = []; //Layers elements
@@ -82,6 +83,27 @@ jviz.components.canvas.ready = function()
 //Updated layers
 jviz.components.canvas.update_layers = function(new_value, old_value)
 {
+  //Save the number of layers
+  //this._layers.num = new_value;
+
+  //Build the layers
+  //return this.build_layers;
+};
+
+//Set the number of layers
+jviz.components.canvas.set_layers = function(value)
+{
+  //Set the number of payers
+  //this.canvasLayers = parseInt(value);
+  this._layers.num = parseInt(value);
+
+  //Build the layers
+  return this.build_layers();
+};
+
+//Build the layers
+jviz.components.canvas.build_layers = function()
+{
   //Clear the container
   jviz.dom.html(this, '');
 
@@ -92,7 +114,7 @@ jviz.components.canvas.update_layers = function(new_value, old_value)
   this.resize();
 
   //Build the layers
-  for(var i = 0; i < this.canvasLayers; i++)
+  for(var i = 0; i < this._layers.num; i++)
   {
     //Get the layer html
     var layer_html = jviz.dom.render('canvas', { id: this._layers.id + i, class: this._layers.class });
@@ -102,7 +124,7 @@ jviz.components.canvas.update_layers = function(new_value, old_value)
   }
 
   //Initialize the canvas elements
-  for(var i = 0; i < this.canvasLayers; i++)
+  for(var i = 0; i < this._layers.num; i++)
   {
     //Get the canvas element
     var el = new jviz.canvas({ id: this._layers.id + i, width: this._width, height: this._height });
@@ -110,13 +132,6 @@ jviz.components.canvas.update_layers = function(new_value, old_value)
     //Initialize the new canvas object
     this._layers.el.push(el);
   }
-};
-
-//Set the number of layers
-jviz.components.canvas.set_layers = function(value)
-{
-  //Set the number of payers
-  this.canvasLayers = parseInt(value);
 };
 
 //Get the layers elements
@@ -128,7 +143,7 @@ jviz.components.canvas.update_width = function(new_value, old_value)
   // Bug: the first time when the component is loaded, the width value is saved correctly, but when
   // we want to get the real width (or height) value, it returns a null value
   //Set the width value
-  jviz.dom.width(this.id, new_value);
+  jviz.dom.width(this, new_value);
 
   //Resize the layers
   this.resize();
@@ -150,7 +165,7 @@ jviz.components.canvas.update_width = function(new_value, old_value)
 jviz.components.canvas.update_height = function(new_value, old_value)
 {
   //Set the height value
-  jviz.dom.height(this.id, new_value);
+  jviz.dom.height(this, new_value);
 
   //Resize the layers
   this.resize();
@@ -197,10 +212,10 @@ jviz.components.canvas.set_margin = function(opt)
 jviz.components.canvas.resize = function()
 {
   //Get the width
-  this._width = jviz.dom.width(this.id);
+  this._width = jviz.dom.width(this);
 
   //Get the height
-  this._height = jviz.dom.height(this.id);
+  this._height = jviz.dom.height(this);
 
   //Save this
   var self = this;
@@ -255,4 +270,4 @@ jviz.components.canvas.draw_resize = function()
 </script>
 
 <!-- Initialize the multicanvas element -->
-<script>Polymer(jviz.components.canvas);</script>
+<script> Polymer(jviz.components.canvas); </script>
