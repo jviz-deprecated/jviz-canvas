@@ -22,6 +22,17 @@ The Jviz Project is under the MIT License. See https://github.com/jviz/jviz/blob
         @apply(--jviz-no-select);
       }
 
+      /* Canvas wrapper */
+      :host ::content .wrapper
+      {
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        top: 0px;
+        left: 0px;
+      }
+
       /* Calvas layer */
       :host ::content .layer
       {
@@ -32,6 +43,8 @@ The Jviz Project is under the MIT License. See https://github.com/jviz/jviz/blob
       }
 
     </style>
+    <!-- Layer wrapper -->
+    <div id="wrapper" class="wrapper"></div>
   </template>
 </dom-module>
 
@@ -68,7 +81,7 @@ jviz.components.canvas.created = function()
   //Layers elements
   this._layers = {};
   this._layers.num = 0; //Number of layers
-  this._layers.id = 'layer-'; //Layers id
+  this._layers.id = jviz.misc.id({ prefix: 'layer-' }); //Layers id
   this._layers.class = 'layer'; //Layers class
   this._layers.el = []; //Layers elements
 };
@@ -106,7 +119,7 @@ jviz.components.canvas.set_layers = function(value)
 jviz.components.canvas.build_layers = function()
 {
   //Clear the container
-  jviz.dom.html(this, '');
+  jviz.dom.html(this.$.wrapper, '');
 
   //Reset the layers elements
   this._layers.el = [];
@@ -121,7 +134,7 @@ jviz.components.canvas.build_layers = function()
     var layer_html = jviz.dom.render('canvas', { id: this._layers.id + i, class: this._layers.class });
 
     //Add the layer
-    jviz.dom.append(this, layer_html);
+    jviz.dom.append(this.$.wrapper, layer_html);
   }
 
   //Initialize the canvas elements
