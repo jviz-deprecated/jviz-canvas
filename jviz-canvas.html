@@ -191,7 +191,10 @@ The Jviz Project is under the MIT License. See https://github.com/jviz/jviz/blob
     });
 
     //Resize the draw
-    return this._draw_resize();
+    this._draw_resize();
+
+    //Emit the resized event
+    this.fire('resized', { width: this._width, height: this._height });
   };
 
   //Get the draw zone
